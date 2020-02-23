@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for post in posts|dictsortreversed:"pub_date" %}
+<p> {% if post.is_new and not post.is_read %} New! {% endif %} Автор: {{ post.author.get_full_name }} | {{ post.pub_date }}</p>
+<a href="/{{request.user.username}}/{{post.id}}"> See complete post </a>
+<p>{{ post.text|linebreaksbr }}</p>
+<hr>
+{% endfor %}
+{% endblock %}

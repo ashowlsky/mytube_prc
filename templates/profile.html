@@ -1,92 +1,116 @@
 {% extends "base.html" %}
-{% block title %} Профиль пользователя {{ author.get_full_name }} {% endblock %}
+{% block title %} Профиль пользователя {{ user.get_full_name }} {% endblock %}
 
 {% block content %}
-
 <main role="main" class="container">
     <div class="row">
-        <div class="col-md-3 mb-3 mt-1">
-             <div class="card">
-                <div class="card-body">
-                    <div class="h2">
-                        <!-- Имя автора -->
-                        {{ author.get_full_name }}
+        <!--User profile card-->
+        <div class="col-lg-4 mt-1">
+            <div class="card mb-3 border-0">
+                <div class="row no-gutters">
+                    <div class="col-lg-3 mb-2 mt-2">
+                        <img class="img-fluid border border-light width=100%" src="{{ user.profile.avatar.url }}">
                     </div>
-                    <div class="h3 text-muted">
-                        <!-- username автора -->
-                        {{ author.username }}
+                    <div class="col-lg-9">
+                        <div class="card-body">
+                            <div class="h4">
+                                <!-- Имя автора -->
+                                {{ user.get_full_name }}
+                            </div>
+                            <div class="h5 text-muted">
+                                <!-- username автора -->
+                                {{ user.username }}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                         <div class="h6 text-muted">
-                            Подписчиков: XXX <br />
-                            Подписан: XXX
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="h6 text-muted">
-                            <!-- Количество записей -->
-                            {{ author.posts.count }}
-                        </div>
-                    </li>
-                 </ul>
-            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="h6 text-muted">
+                        Подписчиков: {{user.followed.count}} <br />
+                        Подписан: {{user.follows.count}} <br />
+                        {% if relation_started %}
+                        Following since: {{ relation_started }}
+                        {% endif %}
+                        {% if request.user != user %}
+                        {% if following %}
+                        <form action="{% url 'unfollowuser' %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" name="unfollow_username" value="{{user.username}}">Stop following</button>   
+                        </form>
+                        {% else %}
+                        <form action="{% url 'followuser' %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" name="follow_username" value="{{user.username}}">Follow</button>
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="h6 text-muted">
+                        <!-- Количество записей -->
+                        {{ user.posts.count }}
+                    </div>
+                </li>
+            </ul>
         </div>
+    </div>
 
-<div class="col-md-9">
+    <div class="col-lg-7">
 
     <!-- Повторяющиеся записи --> 
 
-    <!-- Начало блока с отдельным постом -->
+    <!-- Начало блока с отдельным постом --> 
+    {% for post in user.posts.all|dictsortreversed:"pub_date"|slice:":1" %}
     <div class="card mb-3 mt-1 shadow-sm">
         <div class="card-body">
             <p class="card-text">
                 <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
-                    <a href="/{{ author.username }}/"><strong class="d-block text-gray-dark"> {{ author.username }} </strong></a>
+                    <a href="/{{ post.author.username }}/"><strong class="d-block text-gray-dark"> {{ user.username }} </strong></a>
+                    <a href="/{{ post.author.username }}/{{post.id}}/"><strong class="d-block text-gray-dark"> Страница поста </strong></a>
                         <!-- Текст поста -->
-                                    {% for post in author.posts.all|dictsortreversed:"pub_date"|slice:":1" %}
-                                    <h3>
-                                    Автор: {{ post.author.get_full_name }}
-                                    </h3>
-                                    <p>{{ post.text|linebreaksbr }}</p>
-                                    <hr>                     
+                        <h3>
+                        Автор: {{ post.author.get_full_name }}
+                        </h3>
+                        <p>{{ post.text|linebreaksbr }}</p>
+                        <hr>                     
             </p>
             <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group ">
                     <!-- Ссылка на страницу записи в атрибуте href-->
-                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/" role="button">Добавить комментарий</a>
+                    <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{ post.pk }}/" role="button">Добавить комментарий</a>
                     <!-- Ссылка на редактирование, показывается только автору записи -->
-                    {% if author.username == request.user.username %}
-                    <a class="btn btn-sm text-muted" href="/{{ author.username }}/{{ post.id }}/edit/" role="button">Редактировать</a>
+                    {% if post.author.username == request.user.username %}
+                    <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{ post.pk }}/edit" role="button">Редактировать</a>
                     {% endif %}
-            </div>
+                </div>
                     <!-- Дата публикации  -->
                     <small class="text-muted"> {{ post.pub_date|date:"d M Y" }} </small>
             </div>
         </div>
     </div>
+    <hr>
     {% endfor %}
     <!-- Конец блока с отдельным постом --> 
 
     <!-- Остальные посты --> 
-    
+<div class="post_container">
     {% for post in page|dictsortreversed:"pub_date" %}
     {% if not forloop.first %}
+    <a href="/{{ post.author.username }}/{{post.id}}/"><strong class="d-block text-gray-dark"> Страница поста </strong></a>
     <h3>Автор: {{ post.author.get_full_name }}</h3>
     <p>{{ post.text|linebreaksbr }}</p>
     {{ post.pub_date|date:"d M Y" }}
     <hr>
+    <hr>
     {% endif %}
     {% endfor %}
-
-    <!-- Здесь постраничная навигация паджинатора -->
-    {% if page.has_other_pages %}
-    {% include "paginator.html" with items=page paginator=paginator%}
-    {% endif %}
-
-
 </div>
+<div class="paginator_container_profile">
+    {% if page.has_other_pages %}
+    {% include "paginator.html" %}
+    {% endif %}
 </div>
 </main>
 

@@ -1,21 +1,19 @@
-<nav aria-label="Переключение страниц">
-  <ul class="pagination">
-      {% if items.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">&laquo; Предыдущая</a></li>
-      {% else %}
-              <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo; Предыдущая</a></li>
-      {% endif %}
-      {% for i in paginator.page_range %}
-              {% if items.number == i %}
-              <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(текущая)</span></span></li>
-              {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-              {% endif %}
-      {% endfor %}
-      {% if items.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Следующая &raquo;</a></li>
-      {% else %}
-              <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Следующая &raquo;</a></li>
-      {% endif %}
-  </ul>
+{% load static %}
+<nav class="paginator_nav"><span class="paginator_text">SELECT PAGE</span>
+{% if page.has_previous %}
+  <div class="paginator_div" id = "left">
+    <a class="pagebtn" id="prev"><span class="paginator_icon"><img src="{% static 'bootstrap_icons/chevron-left.svg' %}"></span></a>
+    <a href="?page=1" class="pagebtn">1</a>
+    <a href="?page={{ page.previous_page_number }}" class="pagebtn">PREV</a>
+    <span class="line"></span>
+  </div>
+{% endif %}
+{% if page.has_next %}
+  <div class="paginator_div" id = "right">
+    <a class="pagebtn" id="next"> <span class="paginator_icon"><img src="{% static 'bootstrap_icons/chevron-right.svg' %}"></span></a>
+    <a href="?page={{ page.next_page_number }}" class="pagebtn">NZXT</a>
+    <a href="?page={{ page.paginator.num_pages }}" class="pagebtn">{{ page.paginator.num_pages }}</a>
+    <span class="line"></span>
+  </div>
+{% endif %}
 </nav>

@@ -3,12 +3,15 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{% block title %}Заголовок страницы{% endblock %} | Yatube</title>
+        <title>{% block title %}Заголовок страницы{% endblock %} | Mytube</title>
         <!-- Загрузка статики -->
         {% load static %}
+        <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'customcss/style.css' %}">
         <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
         <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
         <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+        
     </head>
     <body>
         {% include 'nav.html' %}
@@ -20,7 +23,7 @@
                 <!-- Содержимое страницы -->
                 {% endblock content %}
             </div>
-        </main>
-        {% include 'footer.html' %}
+        </main> 
+        {% include 'footer.html' %}          
 </body>
 </html>
