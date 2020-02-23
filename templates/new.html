@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+{% if update_indicator %}
+Редактировать запись
+{% else %} 
+Добавить запись
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %} 
+    {{form.as_p}}
+    {% if update_indicator %}
+    <button type="submit">Сохранить</button>
+    {% else %}
+    <button type="submit">Добавить</button>
+    {% endif %}
+</form>
+{% endblock %}
