@@ -77,7 +77,7 @@ def post_view(request, username, post_id):
     add_comment_form = CommentForm()
     return render(request, 'post.html', {"add_comment_form":add_comment_form, "post":post, "page":page})
 
-
+@login_required
 def post_edit(request, username, post_id):
     update_indicator = True
     post = Post.objects.get(id=post_id)
