@@ -44,7 +44,9 @@ def profile(request, username):
     if Relations.objects.filter(follower_id=current_user.id, following_id=user.id).exists():
         relation = Relations.objects.get(follower_id=current_user.id, following_id=user.id)
         relation_started = relation.started_on
-    following = True if Relations.objects.filter(follower=current_user, following=user).exists() else False
+    following = False
+    if current_user.is_authenticated:
+        following = True if Relations.objects.filter(follower=current_user, following=user).exists() else False
     post_list = user.posts.order_by("-pub_date").all()
     paginator = Paginator(post_list, 5)
     page_number = request.GET.get('page') 

@@ -8,7 +8,7 @@
 {% for post in page %}
     <h3>
          Автор: <a href="/{{post.author.username}}/">{{ post.author.get_full_name }}</a>, Дата публикации: {{ post.pub_date|date:"d M Y" }}
-         <a href="/{{ username }}/{{post.id}}/"><strong class="d-block text-gray-dark"> Страница поста </strong></a>
+         <a href="/{{post.author.username}}/{{post.id}}/"><strong class="d-block text-gray-dark"> Страница поста </strong></a>
     </h3>
     <p>{{ post.text|linebreaksbr }}</p>
     <hr>
