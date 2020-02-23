@@ -10,12 +10,11 @@ from django.dispatch import receiver
 
 
 def index(request):
-    username = request.user.username
     post_list = Post.objects.order_by("-pub_date").all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'index.html', {'page': page, 'username':username})
+    return render(request, 'index.html', {'page': page})
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
