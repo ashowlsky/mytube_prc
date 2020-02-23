@@ -8,11 +8,11 @@
                         <div class="card-body">
                                 <div class="h2">
                                     <!-- Имя автора -->
-                                    {{ author.get_full_name }}
+                                    {{ post.author.get_full_name }}
                                 </div>
                                 <div class="h3 text-muted">
                                      <!-- username автора -->
-                                     {{ author.username }}
+                                     {{ post.author.username }}
                                 </div>
                         </div>
                         <ul class="list-group list-group-flush">
@@ -25,7 +25,7 @@
                                 <li class="list-group-item">
                                         <div class="h6 text-muted">
                                             <!--Количество записей -->
-                                            {{ author.posts.count }}
+                                            {{ post.author.posts.count }}
                                         </div>
                                 </li>
                         </ul>
@@ -43,7 +43,7 @@
                                         <!-- Текст поста -->
                                         <h3>Автор: {{ post.author.get_full_name }}</h3>
                                         <p>{{ post.text|linebreaksbr }}</p>
-                                        {{ post.pub_date|date:"d M Y" }}
+                                        {{ posts.pub_date|date:"d M Y" }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group ">
@@ -51,6 +51,14 @@
                                                 {% if post.author.username == request.user.username %}
                                                 <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{ post.id }}/edit" role="button">Редактировать</a>
                                                 {% endif %}
+                                                <form action="{% url 'like_post' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <button type="submit" name="post_id" value="{{post.id}}">Like | {{post.likes.count }}</button>
+                                                </form>
+                                                <form action="{% url 'dislike_post' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <button type="submit" name="post_id" value="{{post.id}}">Dislike | {{post.dislikes.count }}</button>
+                                                </form>
                                         </div>
                                         <!-- Дата публикации  -->
                                         <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>
@@ -59,5 +67,20 @@
                 </div>
      </div>
     </div>
+{% for comment in page %}
+<h3>Автор: {{ comment.comment_author.get_full_name }}</h3>
+<p> {{ comment.text|linebreaksbr }}</p>
+<p> {{ comment.pub_date|date:"d M Y" }}</p><p>{{ last_edited }}</p>
+{% endfor %}
+<div class="paginator_container_profile">
+{% if page.has_other_pages %}
+{% include "paginator.html" %}
+{% endif %}
+</div>
+<form method="POST">
+        {% csrf_token %} 
+        {{add_comment_form.as_p}}
+        <button type="submit">Добавить</button>
+        </form>
 </main>
 {% endblock %}
