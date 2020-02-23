@@ -18,8 +18,11 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group = group).order_by("-pub_date")[:12]
-    return render(request, "group.html", {"group":group, "posts":posts})
+    post_list = Post.objects.filter(group = group).order_by("-pub_date").all()
+    paginator = Paginator(post_list, 5)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, "group.html", {"group":group, "post_list":post_list, "page":page, 'paginator': paginator})
 
 @login_required
 def new_post(request):
@@ -39,10 +42,10 @@ def profile(request, username):
     current_user = request.user
     """ Добавил проверку подписки на автора, чей профиль просматривается
     чтобы показывать дату начала подписки. Все остальное также как в основном проекте."""
-    relation_started = None
     if Relations.objects.filter(follower_id=current_user.id, following_id=user.id).exists():
         relation = Relations.objects.get(follower_id=current_user.id, following_id=user.id)
         relation_started = relation.started_on
+        return relation_started
     following = False
     if current_user.is_authenticated:
         following = True if Relations.objects.filter(follower=current_user, following=user).exists() else False
