@@ -79,16 +79,19 @@ def post_view(request, username, post_id):
 
 
 def post_edit(request, username, post_id):
-    post = get_object_or_404(Post, id=post_id)
     update_indicator = True
+    post = Post.objects.get(id=post_id)
     current_user = request.user
-    if current_user == post.author:
-        form = PostForm(request.POST or None, instance = post)
+    if current_user != post.author:
+        return redirect('post', username=username, post_id=post.id )
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
-            return redirect('post', username=username, post_id = post.id)
-        return render(request, 'new.html', {'form':form, 'update_indicator':update_indicator})
-    return render(request, "new.html", {"form":form, 'update_indicator':update_indicator})
+            return redirect('post', username=username, post_id=post.id)
+        return render(request, 'new.html', {"form":form, "update_indicator":update_indicator, "post":post})
+    form = PostForm(instance=post)
+    return render(request, "new.html", {"form":form, "update_indicator":update_indicator, "post":post})
 
 @login_required
 def like(request):
